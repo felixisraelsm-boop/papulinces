@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Papulinces - Inicio</title>
+</head>
+<body>
+    <header>
+        <h1>Papulinces</h1>
+        <nav>
+            <strong>Inicio</strong> | 
+            <a href="login2.html">Entrar</a> | 
+            <a href="registro2.html">Registro</a> | 
+            <a href="micuenta2.html">Mi Cuenta</a>
+        </nav>
+        <hr>
+        <section>
+            <input type="search" id="busqueda-global" placeholder="Buscar fotos...">
+            <button type="button" id="btn-buscar" disabled>Buscar</button>
+        </section>
+    </header>
+
+    <main>
+    
+        <section id="area-publicar">
+            <h3>¿Quieres compartir algo?</h3>
+            <p>Para subir fotos y postear, primero debes crear una cuenta.</p>
+            <a href="registro2.html">
+                <button type="button">Subir publicación</button>
+            </a>
+        </section>
+
+        <hr>
+
+        <section id="feed-dinamico">
+            <h2>Publicaciones de la comunidad</h2>
+            
+            <!--publi falsa prueba la ptm aprende a escribir mono de mrd o0hhhh me vengo xdddddd ptm pq sigo escribiendo ya ala mrd chinga tu madre cesar y ustedes tambien pendejetes de manuel y felix maldidas putas ohhhhhhhh xdddddd -->
+            <article style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
+                <header><strong>@usuario_pro</strong></header>
+                <img src="#" alt="Foto de la comunidad" width="200">
+                <p>prueba.</p>
+                
+              
+                <div>
+                    <a href="registro2.html" title="Regístrate para dar Like">
+                        <button type="button"> Me gusta</button>
+                    </a>
+
+                    <div class="comentarios-falsos">
+                        <p><em>Inicia sesión para ver los comentarios...</em></p>
+                        <form action="registro2.html">
+                            <input type="text" placeholder="Escribe un comentario..." readonly>
+                            <button type="submit">Comentar</button>
+                        </form>
+                    </div>
+                </div>
+            </article>
+        </section>
+    </main>
+</body>
+</html>
