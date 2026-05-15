@@ -1,0 +1,288 @@
+/* ===== RESET ===== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* ===== BODY ===== */
+
+body{
+    background:#1e1e1e;
+
+    color:white;
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* ===== HEADER ===== */
+
+header{
+    background:#2e7d32;
+
+    padding:20px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:15px;
+}
+
+/* ===== NAV ===== */
+
+nav{
+    width:100%;
+    max-width:1000px;
+}
+
+/* ===== LINK NAV ===== */
+
+nav a{
+    text-decoration:none;
+
+    color:white;
+
+    background:#388e3c;
+
+    padding:10px 18px;
+
+    border-radius:10px;
+
+    transition:.3s;
+}
+
+nav a:hover{
+    background:#43a047;
+}
+
+/* ===== TITULO ===== */
+
+h1{
+    font-size:38px;
+
+    color:white;
+}
+
+/* ===== MAIN ===== */
+
+main{
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:35px;
+
+    padding:40px 20px;
+}
+
+/* ===== PERFIL ===== */
+
+#info-perfil{
+    width:100%;
+    max-width:800px;
+
+    background:#2b2b2b;
+
+    border-radius:20px;
+
+    padding:35px;
+
+    display:flex;
+    flex-direction:column;
+
+    align-items:center;
+
+    gap:20px;
+}
+
+/* ===== AVATAR ===== */
+
+#info-perfil img{
+    width:120px;
+    height:120px;
+
+    border-radius:25px;
+
+    object-fit:cover;
+
+    border:4px solid #43a047;
+
+    background:#444;
+}
+
+/* ===== NOMBRE ===== */
+
+#display-user{
+    font-size:30px;
+
+    text-align:center;
+}
+
+/* ===== BIO ===== */
+
+#display-bio{
+    color:#d0d0d0;
+
+    text-align:center;
+
+    max-width:500px;
+
+    line-height:1.5;
+}
+
+/* ===== BOTON ===== */
+
+#btn-editar-perfil{
+    padding:14px 24px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#43a047;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+/* ===== HOVER ===== */
+
+#btn-editar-perfil:hover{
+    background:#66bb6a;
+}
+
+/* ===== DESACTIVADO ===== */
+
+#btn-editar-perfil:disabled{
+    background:gray;
+
+    cursor:not-allowed;
+}
+
+/* ===== LINEA ===== */
+
+hr{
+    width:90%;
+    max-width:900px;
+
+    border:none;
+
+    height:2px;
+
+    background:#43a047;
+}
+
+/* ===== PUBLICACIONES ===== */
+
+#mis-fotos{
+    width:100%;
+    max-width:900px;
+
+    background:#2b2b2b;
+
+    border-radius:20px;
+
+    padding:35px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:25px;
+}
+
+/* ===== TITULO PUBLICACIONES ===== */
+
+#mis-fotos h3{
+    font-size:28px;
+
+    color:#81c784;
+}
+
+/* ===== GALERIA ===== */
+
+#galeria-personal{
+    display:flex;
+    flex-direction:column;
+
+    gap:20px;
+}
+
+/* ===== TARJETA ===== */
+
+#galeria-personal p{
+    background:#3a3a3a;
+
+    padding:25px;
+
+    border-radius:15px;
+
+    color:#e0e0e0;
+
+    text-align:center;
+}
+
+/* ===== BOTON ELIMINAR ===== */
+
+#galeria-personal button{
+    padding:14px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#c62828;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+/* ===== HOVER ===== */
+
+#galeria-personal button:hover{
+    background:#e53935;
+}
+
+/* ===== DESACTIVADO ===== */
+
+#galeria-personal button:disabled{
+    background:gray;
+
+    cursor:not-allowed;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:700px){
+
+    h1{
+        font-size:28px;
+    }
+
+    #info-perfil,
+    #mis-fotos{
+        padding:25px;
+    }
+
+    #display-user{
+        font-size:24px;
+    }
+
+}
