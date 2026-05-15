@@ -1,0 +1,248 @@
+/* ===== RESET ===== */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Arial, Helvetica, sans-serif;
+}
+
+/* ===== BODY ===== */
+
+body{
+    background:#1b1b1b;
+
+    min-height:100vh;
+
+    display:flex;
+    flex-direction:column;
+}
+
+/* ===== HEADER ===== */
+
+header{
+    width:100%;
+
+    background:#a61c1c;
+
+    padding:25px;
+
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+
+    gap:20px;
+
+    box-shadow:0 4px 15px rgba(0,0,0,.4);
+}
+
+/* ===== NAV ===== */
+
+nav{
+    width:100%;
+    max-width:1000px;
+}
+
+/* ===== BOTON NAV ===== */
+
+nav a{
+    text-decoration:none;
+
+    color:black;
+
+    background:#ececec;
+
+    padding:12px 20px;
+
+    border-radius:10px;
+
+    font-weight:bold;
+
+    transition:.3s;
+}
+
+nav a:hover{
+    background:white;
+
+    transform:scale(1.03);
+}
+
+/* ===== TITULO ===== */
+
+h1{
+    font-size:42px;
+
+    color:black;
+
+    text-align:center;
+
+    letter-spacing:1px;
+}
+
+/* ===== MAIN ===== */
+
+main{
+    flex:1;
+
+    display:flex;
+    flex-direction:column;
+
+    justify-content:center;
+    align-items:center;
+
+    gap:25px;
+
+    padding:40px;
+}
+
+/* ===== FORMULARIO LIBRETA ===== */
+
+#form-login{
+    width:100%;
+    max-width:550px;
+
+    background:
+    repeating-linear-gradient(
+        to bottom,
+        #f7f7f7,
+        #f7f7f7 35px,
+        #cfd8ff 36px
+    );
+
+    border-left:10px solid #ef5350;
+
+    border-radius:20px;
+
+    padding:50px;
+
+    display:flex;
+    flex-direction:column;
+
+    gap:20px;
+
+    box-shadow:0 0 30px rgba(0,0,0,.5);
+}
+
+/* ===== LABELS ===== */
+
+label{
+    color:#222;
+
+    font-size:18px;
+
+    font-weight:bold;
+}
+
+/* ===== INPUTS ===== */
+
+input{
+    width:100%;
+
+    padding:14px;
+
+    border:none;
+
+    border-radius:10px;
+
+    outline:none;
+
+    font-size:16px;
+
+    background:white;
+
+    border:2px solid #cfd8dc;
+
+    transition:.3s;
+}
+
+/* ===== FOCUS ===== */
+
+input:focus{
+    border:2px solid #42a5f5;
+
+    box-shadow:0 0 10px rgba(66,165,245,.5);
+}
+
+/* ===== BOTON ===== */
+
+#btn-entrar{
+    margin-top:15px;
+
+    padding:16px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#43a047;
+
+    color:white;
+
+    font-size:18px;
+
+    font-weight:bold;
+
+    cursor:pointer;
+
+    transition:.3s;
+}
+
+/* ===== HOVER ===== */
+
+#btn-entrar:hover{
+    background:#66bb6a;
+
+    transform:scale(1.03);
+}
+
+/* ===== DESACTIVADO ===== */
+
+#btn-entrar:disabled{
+    background:gray;
+
+    cursor:not-allowed;
+
+    transform:none;
+}
+
+/* ===== TEXTO REGISTRO ===== */
+
+p{
+    color:white;
+
+    font-size:17px;
+
+    text-align:center;
+}
+
+/* ===== LINK REGISTRO ===== */
+
+p a{
+    color:#81c784;
+
+    text-decoration:none;
+
+    font-weight:bold;
+
+    transition:.3s;
+}
+
+p a:hover{
+    color:#a5d6a7;
+
+    text-decoration:underline;
+}
+
+/* ===== RESPONSIVE ===== */
+
+@media(max-width:700px){
+
+    h1{
+        font-size:30px;
+    }
+
+    #form-login{
+        padding:30px;
+    }
+
+}
