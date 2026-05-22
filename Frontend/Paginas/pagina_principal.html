@@ -8,7 +8,7 @@
 <body>
     <header>
         <h1>Papulinces</h1>
-        <nav>
+        <nav id="nav-dinamico">
             <strong>Inicio</strong> | 
             <a href="login.html">Entrar</a> | 
             <a href="registro.html">Registro</a> | 
@@ -17,12 +17,11 @@
         <hr>
         <section>
             <input type="search" id="busqueda-global" placeholder="Buscar fotos...">
-            <button type="button" id="btn-buscar" disabled>Buscar</button>
+            <button type="button" id="btn-buscar">Buscar</button>
         </section>
     </header>
 
     <main>
-    
         <section id="area-publicar">
             <h3>¿Quieres compartir algo?</h3>
             <p>Para subir fotos y postear, primero debes crear una cuenta.</p>
@@ -35,29 +34,10 @@
 
         <section id="feed-dinamico">
             <h2>Publicaciones de la comunidad</h2>
-            
-            <!--publi falsa prueba la ptm aprende a escribir mono de mrd o0hhhh me vengo xdddddd ptm pq sigo escribiendo ya ala mrd chinga tu madre cesar y ustedes tambien pendejetes de manuel y felix maldidas putas ohhhhhhhh xdddddd -->
-            <article style="border: 1px solid #ccc; padding: 10px; margin-bottom: 20px;">
-                <header><strong>@usuario_pro</strong></header>
-                <img src="#" alt="Foto de la comunidad" width="200">
-                <p>prueba.</p>
-                
-              
-                <div>
-                    <a href="registro.html" title="Regístrate para dar Like">
-                        <button type="button"> Me gusta</button>
-                    </a>
-
-                    <div class="comentarios-falsos">
-                        <p><em>Inicia sesión para ver los comentarios...</em></p>
-                        <form action="registro.html">
-                            <input type="text" placeholder="Escribe un comentario..." readonly>
-                            <button type="submit">Comentar</button>
-                        </form>
-                    </div>
-                </div>
-            </article>
+            <p>Cargando publicaciones...</p>
         </section>
     </main>
+
+    <script src="../js/main.js"></script>
 </body>
 </html>
