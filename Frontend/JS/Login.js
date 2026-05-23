@@ -52,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
             
             const avatarInput = document.getElementById("reg-avatar");
             if (avatarInput.files.length > 0) {
-                formData.append("avatar", avatarInput.files[0]); // Envía el archivo físico
+                formData.append("fotoPerfil", avatarInput.files[0]); // Envía el archivo físico
             }
 
             try {
@@ -70,8 +70,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 alert("¡Cuenta creada con éxito! Ahora puedes iniciar sesión.");
                 window.location.href = "login.html";
 
-            } catch (error) {
-                alert(error.message);
+           } catch (error) {
+                console.error("ERROR COMPLETO:", error);
+                // Si el servidor falla, a veces la respuesta no es JSON
+                alert("Error: " + error.message);
             }
         });
     }
