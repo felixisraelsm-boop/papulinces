@@ -8,7 +8,9 @@ const {
     crearPost,
     obtenerPosts,
     obtenerMisPosts,
-    eliminarPost
+    eliminarPost,
+    agregarComentario, 
+    eliminarComentario
 } = require("../controladores/postController");
 
 const protegerRuta = require(
@@ -53,5 +55,7 @@ router.post(
     upload.single("imagen"),
     crearPost
 );
+router.post("/:id/comentarios", protegerRuta, agregarComentario);
 
+router.delete("/:postId/comentarios/:comentarioId", protegerRuta, eliminarComentario);
 module.exports = router;

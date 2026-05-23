@@ -59,10 +59,8 @@ function actualizarNav(token) {
                 e.preventDefault();
                 
                 const formData = new FormData();
-                // 1. Enviamos el texto (Requerido por postController.js -> req.body.texto)
                 formData.append("texto", document.getElementById("post-texto").value);
                 
-                // 2. Enviamos la imagen (Requerido por postRoutes.js -> upload.single("imagen"))
                 const inputImagen = document.getElementById("post-imagen");
                 if (inputImagen.files.length > 0) {
                     formData.append("imagen", inputImagen.files[0]); 
@@ -72,12 +70,11 @@ function actualizarNav(token) {
                     const respuesta = await fetch(URL_POSTS, {
                         method: "POST",
                         headers: {
-                            "Authorization": token // 👈 El token para que el middleware 'protegerRuta' sepa quién eres
+                            "Authorization": token 
                         },
-                        body: formData // Enviamos todo de forma nativa sin headers manuales de tipo Content-Type
+                        body: formData 
                     });
 
-                    // Si el backend da error y manda HTML (como el error anterior), lo atrapamos aquí
                     const contentType = respuesta.headers.get("content-type");
                     if (contentType && contentType.includes("text/html")) {
                         throw new Error("El servidor tuvo un problema interno al procesar el archivo o faltan datos.");
@@ -90,7 +87,7 @@ function actualizarNav(token) {
                     }
 
                     alert("¡Publicación compartida con éxito!");
-                    window.location.reload(); // Refresca para que aparezca abajo en el feed
+                    window.location.reload(); 
 
                 } catch (error) {
                     alert(error.message);
@@ -115,6 +112,10 @@ async function cargarFeed() {
     const contenedorFeed = document.getElementById("feed-dinamico");
     if (!contenedorFeed) return;
 
+    const token = localStorage.getItem("token");
+    // 🚀 Recuperamos el usuario logueado para comparar IDs más adelante
+    const usuarioLogueado = localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")) : null;
+
     try {
         const respuesta = await fetch(URL_POSTS);
         const posts = await respuesta.json();
@@ -138,13 +139,62 @@ async function cargarFeed() {
             article.style.borderRadius = "8px";
 
             const usuarioNombre = post.usuario ? post.usuario.username : "Usuario Anónimo";
+            
+         
+            const creadorPostId = post.usuario ? (post.usuario._id || post.usuario) : null;
+            // ID del usuario que tiene la sesión iniciada en este navegador
+            const idUsuarioActual = usuarioLogueado ? (usuarioLogueado._id || usuarioLogueado.id) : null;
 
-            // Se renderiza la imagen apuntando a la carpeta de publicaciones del backend
+           
+            let comentariosHTML = "";
+            if (post.comentarios && post.comentarios.length > 0) {
+                post.comentarios.forEach(com => {
+                    const comUsuarioNombre = com.usuario ? com.usuario.username : "Anónimo";
+                    
+                   
+                    const esDuenioDelPost = idUsuarioActual && creadorPostId && (idUsuarioActual === creadorPostId);
+                    
+                    // Si es el dueño del post, le renderizamos el botón de eliminar comentario
+                    const botonEliminarComentario = esDuenioDelPost 
+                        ? `<button onclick="eliminarComentario('${post._id}', '${com._id}')" style="background: none; border: none; color: red; cursor: pointer; font-size: 0.9em;">🗑️</button>` 
+                        : "";
+
+                    comentariosHTML += `
+                        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 5px 10px; margin: 4px 0; border-radius: 4px; font-size: 0.9em;">
+                            <span><strong>@${comUsuarioNombre}</strong>: ${com.texto}</span>
+                            ${botonEliminarComentario}
+                        </div>
+                    `;
+                });
+            } else {
+                comentariosHTML = `<p style="color: gray; font-size: 0.85em; font-style: italic;">No hay comentarios aún.</p>`;
+            }
+
+            // 🚀 Construir el formulario para añadir un nuevo comentario (solo si hay token/sesión)
+            let formComentarioHTML = "";
+            if (token) {
+                formComentarioHTML = `
+                    <form onsubmit="agregarComentario(event, '${post._id}')" style="margin-top: 12px; display: flex; gap: 8px;">
+                        <input type="text" id="input-comentario-${post._id}" placeholder="Escribe un comentario..." required style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
+                        <button type="submit" style="padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Comentar</button>
+                    </form>
+                `;
+            } else {
+                formComentarioHTML = `<p style="color: gray; font-size: 0.85em; margin-top: 10px;">Inicia sesión para dejar un comentario.</p>`;
+            }
+
+            // Inyectamos todo al article del post
             article.innerHTML = `
                 <strong>@${usuarioNombre}</strong>
                 ${post.imagen ? `<br><img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" alt="Post" style="max-width: 100%; max-height: 400px; border-radius: 4px; margin-top: 10px;">` : ''}
                 <p>${post.texto}</p>
                 <small style="color: gray;">${new Date(post.createdAt).toLocaleDateString()}</small>
+                
+                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 0.95em; color: #333;">Comentarios:</h4>
+                    <div class="contenedor-comentarios">${comentariosHTML}</div>
+                    ${formComentarioHTML}
+                </div>
             `;
             contenedorFeed.appendChild(article);
         });
@@ -256,3 +306,60 @@ async function eliminarPublicacion(id) {
         console.error(error);
     }
 }
+
+// Función para enviar un nuevo comentario al Backend
+window.agregarComentario = async (event, postId) => {
+    event.preventDefault();
+    const token = localStorage.getItem("token");
+    const inputTexto = document.getElementById(`input-comentario-${postId}`);
+    
+    if (!inputTexto || !inputTexto.value.trim()) return;
+
+    try {
+        const respuesta = await fetch(`${URL_POSTS}/${postId}/comentarios`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "Authorization": token
+            },
+            body: JSON.stringify({ texto: inputTexto.value.trim() })
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            inputTexto.value = ""; // Limpiamos la caja de texto
+            cargarFeed(); // Recargamos el feed para reflejar el nuevo comentario en pantalla
+        } else {
+            alert(datos.mensaje || "Error al añadir comentario");
+        }
+    } catch (error) {
+        console.error("Error en agregarComentario:", error);
+    }
+};
+
+// Función para eliminar un comentario (Solo habilitado en Backend y Frontend para el creador del post)
+window.eliminarComentario = async (postId, comentarioId) => {
+    if (!confirm("¿Seguro que deseas eliminar este comentario?")) return;
+    const token = localStorage.getItem("token");
+
+    try {
+        const respuesta = await fetch(`${URL_POSTS}/${postId}/comentarios/${comentarioId}`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": token
+            }
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert("Comentario eliminado correctamente.");
+            cargarFeed(); // Volvemos a pintar el feed actualizado
+        } else {
+            alert(datos.mensaje || "No se pudo eliminar el comentario.");
+        }
+    } catch (error) {
+        console.error("Error en eliminarComentario:", error);
+    }
+};
