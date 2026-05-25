@@ -113,7 +113,6 @@ async function cargarFeed() {
     if (!contenedorFeed) return;
 
     const token = localStorage.getItem("token");
-    // 🚀 Recuperamos el usuario logueado para comparar IDs más adelante
     const usuarioLogueado = localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")) : null;
 
     try {
@@ -133,65 +132,53 @@ async function cargarFeed() {
 
         posts.forEach(post => {
             const article = document.createElement("article");
-            article.style.border = "1px solid #ccc";
-            article.style.padding = "15px";
-            article.style.margin = "15px 0";
-            article.style.borderRadius = "8px";
 
             const usuarioNombre = post.usuario ? post.usuario.username : "Usuario Anónimo";
-            
-         
             const creadorPostId = post.usuario ? (post.usuario._id || post.usuario) : null;
-            // ID del usuario que tiene la sesión iniciada en este navegador
             const idUsuarioActual = usuarioLogueado ? (usuarioLogueado._id || usuarioLogueado.id) : null;
 
-           
             let comentariosHTML = "";
             if (post.comentarios && post.comentarios.length > 0) {
                 post.comentarios.forEach(com => {
                     const comUsuarioNombre = com.usuario ? com.usuario.username : "Anónimo";
-                    
-                   
                     const esDuenioDelPost = idUsuarioActual && creadorPostId && (idUsuarioActual === creadorPostId);
                     
-                    // Si es el dueño del post, le renderizamos el botón de eliminar comentario
                     const botonEliminarComentario = esDuenioDelPost 
-                        ? `<button onclick="eliminarComentario('${post._id}', '${com._id}')" style="background: none; border: none; color: red; cursor: pointer; font-size: 0.9em;">🗑️</button>` 
+                        ? `<button onclick="eliminarComentario('${post._id}', '${com._id}')" class="btn-borrar-comentario">🗑️</button>` 
                         : "";
 
+                    // SE MODIFICÓ AQUÍ: Ahora usa la clase 'comentario-item' y no estilos manuales
                     comentariosHTML += `
-                        <div style="display: flex; justify-content: space-between; align-items: center; background: #f8f9fa; padding: 5px 10px; margin: 4px 0; border-radius: 4px; font-size: 0.9em;">
+                        <div class="comentario-item">
                             <span><strong>@${comUsuarioNombre}</strong>: ${com.texto}</span>
                             ${botonEliminarComentario}
                         </div>
                     `;
                 });
             } else {
-                comentariosHTML = `<p style="color: gray; font-size: 0.85em; font-style: italic;">No hay comentarios aún.</p>`;
+                comentariosHTML = `<p class="comentarios-vacio">No hay comentarios aún.</p>`;
             }
 
-            // 🚀 Construir el formulario para añadir un nuevo comentario (solo si hay token/sesión)
             let formComentarioHTML = "";
             if (token) {
                 formComentarioHTML = `
-                    <form onsubmit="agregarComentario(event, '${post._id}')" style="margin-top: 12px; display: flex; gap: 8px;">
-                        <input type="text" id="input-comentario-${post._id}" placeholder="Escribe un comentario..." required style="flex: 1; padding: 6px; border: 1px solid #ccc; border-radius: 4px;">
-                        <button type="submit" style="padding: 6px 12px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">Comentar</button>
+                    <form onsubmit="agregarComentario(event, '${post._id}')" class="form-comentario">
+                        <input type="text" id="input-comentario-${post._id}" placeholder="Escribe un comentario..." required>
+                        <button type="submit">Comentar</button>
                     </form>
                 `;
             } else {
-                formComentarioHTML = `<p style="color: gray; font-size: 0.85em; margin-top: 10px;">Inicia sesión para dejar un comentario.</p>`;
+                formComentarioHTML = `<p class="comentarios-bloqueado">Inicia sesión para dejar un comentario.</p>`;
             }
 
-            // Inyectamos todo al article del post
             article.innerHTML = `
-                <strong>@${usuarioNombre}</strong>
-                ${post.imagen ? `<br><img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" alt="Post" style="max-width: 100%; max-height: 400px; border-radius: 4px; margin-top: 10px;">` : ''}
+                <header><strong>@${usuarioNombre}</strong></header>
+                ${post.imagen ? `<img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" alt="Post">` : ''}
                 <p>${post.texto}</p>
                 <small style="color: gray;">${new Date(post.createdAt).toLocaleDateString()}</small>
                 
-                <div style="margin-top: 15px; padding-top: 10px; border-top: 1px dashed #eee;">
-                    <h4 style="margin: 0 0 8px 0; font-size: 0.95em; color: #333;">Comentarios:</h4>
+                <div class="seccion-comentarios">
+                    <h4>Comentarios:</h4>
                     <div class="contenedor-comentarios">${comentariosHTML}</div>
                     ${formComentarioHTML}
                 </div>
@@ -328,8 +315,8 @@ window.agregarComentario = async (event, postId) => {
         const datos = await respuesta.json();
 
         if (respuesta.ok) {
-            inputTexto.value = ""; // Limpiamos la caja de texto
-            cargarFeed(); // Recargamos el feed para reflejar el nuevo comentario en pantalla
+            inputTexto.value = ""; 
+            cargarFeed(); 
         } else {
             alert(datos.mensaje || "Error al añadir comentario");
         }
@@ -338,7 +325,7 @@ window.agregarComentario = async (event, postId) => {
     }
 };
 
-// Función para eliminar un comentario (Solo habilitado en Backend y Frontend para el creador del post)
+// Función para eliminar un comentario
 window.eliminarComentario = async (postId, comentarioId) => {
     if (!confirm("¿Seguro que deseas eliminar este comentario?")) return;
     const token = localStorage.getItem("token");
@@ -355,7 +342,7 @@ window.eliminarComentario = async (postId, comentarioId) => {
 
         if (respuesta.ok) {
             alert("Comentario eliminado correctamente.");
-            cargarFeed(); // Volvemos a pintar el feed actualizado
+            cargarFeed(); 
         } else {
             alert(datos.mensaje || "No se pudo eliminar el comentario.");
         }
