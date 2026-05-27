@@ -1,19 +1,11 @@
 const Publicacion = require("../modelos/Publicacion");
 
 const crearPost = async (req, res) => {
-
     try {
-
         const nuevaPublicacion = new Publicacion({
-
             usuario: req.usuario,
-
             texto: req.body.texto,
-
-            imagen: req.file
-                ? req.file.filename
-                : ""
-
+            imagen: req.file ? req.file.filename : ""
         });
 
         await nuevaPublicacion.save();
@@ -24,18 +16,26 @@ const crearPost = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
             mensaje: "Error al crear publicación"
         });
     }
 };
 
+// 🚀 MODIFICADO: Ahora soporta filtros de búsqueda en tiempo real
 const obtenerPosts = async (req, res) => {
     try {
-        const posts = await Publicacion.find()
+        const { buscar } = req.query;
+        let filtro = {};
+
+        // Si el usuario escribió algo en la barra, buscamos coincidencias (sin importar mayúsculas/minúsculas)
+        if (buscar) {
+            filtro = { texto: { $regex: buscar, $options: "i" } };
+        }
+
+        const posts = await Publicacion.find(filtro)
             .populate("usuario", "username")
-            .populate("comentarios.usuario", "username") // 👈 Trae el username de quien comentó
+            .populate("comentarios.usuario", "username")
             .sort({ createdAt: -1 });
 
         res.json(posts);
@@ -46,11 +46,11 @@ const obtenerPosts = async (req, res) => {
 
 const agregarComentario = async (req, res) => {
     try {
-        const { id } = req.params; // ID de la publicación
+        const { id } = req.params; 
         const { texto } = req.body;
 
         if (!texto) {
-            return res.status(400).json({ mensaje: "El comentario no puede estar vacío" });
+            return res.status(400).json({ mensaje: "El texto del comentario es obligatorio" });
         }
 
         const post = await Publicacion.findById(id);
@@ -58,21 +58,16 @@ const agregarComentario = async (req, res) => {
             return res.status(404).json({ mensaje: "Publicación no encontrada" });
         }
 
-        
-        const nuevoComentario = {
+        post.comentarios.push({
             usuario: req.usuario,
             texto: texto
-        };
+        });
 
-        post.comentarios.push(nuevoComentario);
         await post.save();
 
-        res.status(201).json({ 
-            mensaje: "Comentario agregado con éxito", 
-            post 
-        });
+        res.status(201).json({ mensaje: "Comentario añadido correctamente" });
     } catch (error) {
-        res.status(500).json({ mensaje: "Error al agregar el comentario" });
+        res.status(500).json({ mensaje: "Error al añadir el comentario" });
     }
 };
 
@@ -85,16 +80,17 @@ const eliminarComentario = async (req, res) => {
             return res.status(404).json({ mensaje: "Publicación no encontrada" });
         }
 
-       
-        if (post.usuario.toString() !== req.usuario) {
-            return res.status(403).json({ 
-                mensaje: "No autorizado. Solo el dueño de la publicación puede borrar comentarios." 
-            });
+        const comentario = post.comentarios.id(comentarioId);
+        if (!comentario) {
+            return res.status(404).json({ mensaje: "Comentario no encontrado" });
         }
 
-        
+        if (post.usuario.toString() !== req.usuario) {
+            return res.status(401).json({ mensaje: "No tienes permiso para borrar este comentario" });
+        }
+
         post.comentarios = post.comentarios.filter(
-            (comentario) => comentario._id.toString() !== comentarioId
+            (c) => c._id.toString() !== comentarioId
         );
 
         await post.save();
@@ -106,9 +102,7 @@ const eliminarComentario = async (req, res) => {
 };
 
 const obtenerMisPosts = async (req, res) => {
-
     try {
-
         const posts = await Publicacion.find({
             usuario: req.usuario
         })
@@ -117,7 +111,6 @@ const obtenerMisPosts = async (req, res) => {
         res.json(posts);
 
     } catch (error) {
-
         res.status(500).json({
             mensaje: "Error al obtener tus publicaciones"
         });
@@ -125,24 +118,16 @@ const obtenerMisPosts = async (req, res) => {
 };
 
 const eliminarPost = async (req, res) => {
-
     try {
-
-        const post = await Publicacion.findById(
-            req.params.id
-        );
+        const post = await Publicacion.findById(req.params.id);
 
         if (!post) {
-
             return res.status(404).json({
                 mensaje: "Publicación no encontrada"
             });
         }
 
-        if (
-            post.usuario.toString() !== req.usuario
-        ) {
-
+        if (post.usuario.toString() !== req.usuario) {
             return res.status(401).json({
                 mensaje: "No autorizado"
             });
@@ -155,9 +140,8 @@ const eliminarPost = async (req, res) => {
         });
 
     } catch (error) {
-
         res.status(500).json({
-            mensaje: "Error al eliminar publicación"
+            mensaje: "Error al eliminar la publicación"
         });
     }
 };
@@ -167,6 +151,6 @@ module.exports = {
     obtenerPosts,
     obtenerMisPosts,
     eliminarPost,
-    agregarComentario, 
-    eliminarComentario  
+    agregarComentario,
+    eliminarComentario
 };

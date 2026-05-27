@@ -7,14 +7,32 @@ document.addEventListener("DOMContentLoaded", () => {
     // Configurar barra de navegación y área de post dinámicas
     actualizarNav(token);
 
-    // Si estamos en la página principal, cargamos el feed
+    // Si estamos en la página principal, cargamos el feed y activamos el buscador
     if (document.getElementById("feed-dinamico")) {
         cargarFeed();
+
+        // 🚀 AGREGADO: Lógica para el funcionamiento del Buscador Global
+        const btnBuscar = document.getElementById("btn-buscar");
+        const inputBusqueda = document.getElementById("busqueda-global");
+
+        if (btnBuscar && inputBusqueda) {
+            btnBuscar.addEventListener("click", () => {
+                const texto = inputBusqueda.value.trim();
+                cargarFeed(texto); // Recarga el feed filtrado por palabras clave
+            });
+
+            inputBusqueda.addEventListener("keypress", (e) => {
+                if (e.key === "Enter") {
+                    cargarFeed(inputBusqueda.value.trim());
+                }
+            });
+        }
     }
 
     // Si estamos en la página de Mi Cuenta, cargamos el perfil del usuario
     if (document.getElementById("info-perfil")) {
         cargarPerfilUsuario(token);
+        cargarMisPublicaciones(token); // Carga tus fotos al entrar a la cuenta
     }
 });
 
@@ -36,79 +54,81 @@ function actualizarNav(token) {
                 e.preventDefault();
                 localStorage.clear();
                 alert("Sesión cerrada");
-                window.location.reload();
+                window.location.href = "pagina_principal.html";
             });
         }
 
-        // Reemplazar el mensaje por el formulario dinámico real para subir posts con fotos
+        // Cambiamos la sección de publicar por un formulario real
         if (areaPublicar) {
             areaPublicar.innerHTML = `
-                <h3>Compartir una nueva publicación</h3>
-                <form id="form-crear-post">
-                    <textarea id="post-texto" placeholder="¿Qué estás pensando?" required style="padding: 10px; width: 100%; max-width: 400px; min-height: 60px; display: block; margin-bottom: 10px;"></textarea>
-                    
-                    <label for="post-imagen" style="display: block; font-weight: bold; margin-bottom: 5px;">Seleccionar imagen:</label>
-                    <input type="file" id="post-imagen" accept="image/*" style="display: block; margin-bottom: 10px;">
-
-                    <button type="submit" style="cursor: pointer; padding: 10px; background-color: #28a745; color: white; border: none; border-radius: 4px; font-weight: bold;">Publicar en la comunidad</button>
+                <h3>Comparte algo con la comunidad</h3>
+                <form id="form-publicar" enctype="multipart/form-data">
+                    <textarea id="texto-post" placeholder="¿En qué estás pensando?" required></textarea>
+                    <br><br>
+                    <label>Subir una foto (opcional):</label>
+                    <input type="file" id="imagen-post" accept="image/*">
+                    <br><br>
+                    <button type="submit">Publicar</button>
                 </form>
             `;
 
-            // Escuchar el envío del formulario estructurado como FormData
-            document.getElementById("form-crear-post").addEventListener("submit", async (e) => {
-                e.preventDefault();
-                
-                const formData = new FormData();
-                formData.append("texto", document.getElementById("post-texto").value);
-                
-                const inputImagen = document.getElementById("post-imagen");
-                if (inputImagen.files.length > 0) {
-                    formData.append("imagen", inputImagen.files[0]); 
-                }
-
-                try {
-                    const respuesta = await fetch(URL_POSTS, {
-                        method: "POST",
-                        headers: {
-                            "Authorization": token 
-                        },
-                        body: formData 
-                    });
-
-                    const contentType = respuesta.headers.get("content-type");
-                    if (contentType && contentType.includes("text/html")) {
-                        throw new Error("El servidor tuvo un problema interno al procesar el archivo o faltan datos.");
-                    }
-
-                    const resultado = await respuesta.json();
-
-                    if (!respuesta.ok) {
-                        throw new Error(resultado.mensaje || "Error al crear la publicación");
-                    }
-
-                    alert("¡Publicación compartida con éxito!");
-                    window.location.reload(); 
-
-                } catch (error) {
-                    alert(error.message);
-                }
-            });
+            // Escuchamos el envío del nuevo post
+            document.getElementById("form-publicar").addEventListener("submit", crearNuevaPublicacion);
         }
 
     } else {
+        // Si NO hay token (usuario visitante sin iniciar sesión)
         if (nav) {
             nav.innerHTML = `
-                <strong>Inicio</strong> | 
-                <a href="login.html">Entrar</a> | 
-                <a href="registro.html">Registro</a> | 
-                <a href="mi_cuenta.html">Mi Cuenta</a>
+                <a href="pagina_principal.html">Inicio</a> | 
+                <a href="login.html">Iniciar Sesión</a> | 
+                <a href="registro.html">Regístrate</a>
             `;
         }
     }
 }
 
-// === CARGAR TODAS LAS PUBLICACIONES EN EL FEED ===
-async function cargarFeed() {
+// === ENVIAR NUEVA PUBLICACIÓN AL SERVIDOR ===
+async function crearNuevaPublicacion(e) {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    const texto = document.getElementById("texto-post").value;
+    const imagenInput = document.getElementById("imagen-post");
+
+    // Como subimos archivo físico usamos FormData
+    const formData = new FormData();
+    formData.append("texto", texto);
+    if (imagenInput.files.length > 0) {
+        formData.append("imagen", imagenInput.files[0]);
+    }
+
+    try {
+        const respuesta = await fetch(URL_POSTS, {
+            method: "POST",
+            headers: {
+                "Authorization": token // Pasamos el token para saber quién publica
+            },
+            body: formData
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert("¡Publicación subida con éxito!");
+            document.getElementById("form-publicar").reset(); // Limpia el formulario
+            cargarFeed(); // Recarga las publicaciones abajo
+        } else {
+            alert("Error: " + datos.mensaje);
+        }
+
+    } catch (error) {
+        console.error("Error en crearNuevaPublicacion:", error);
+    }
+}
+
+// === CARGAR LAS PUBLICACIONES EN EL FEED (CON SOPORTE DE BÚSQUEDA) ===
+async function cargarFeed(terminoBusqueda = "") {
     const contenedorFeed = document.getElementById("feed-dinamico");
     if (!contenedorFeed) return;
 
@@ -116,7 +136,12 @@ async function cargarFeed() {
     const usuarioLogueado = localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")) : null;
 
     try {
-        const respuesta = await fetch(URL_POSTS);
+        // 🚀 URL dinámica: Si busca algo, añade '?buscar=palabra'
+        const urlFinal = terminoBusqueda 
+            ? `${URL_POSTS}?buscar=${encodeURIComponent(terminoBusqueda)}` 
+            : URL_POSTS;
+
+        const respuesta = await fetch(urlFinal);
         const posts = await respuesta.json();
 
         if (!respuesta.ok) {
@@ -124,7 +149,7 @@ async function cargarFeed() {
         }
 
         if (posts.length === 0) {
-            contenedorFeed.innerHTML = "<h2>Publicaciones de la comunidad</h2><p>No hay publicaciones todavía. ¡Sé el primero!</p>";
+            contenedorFeed.innerHTML = "<h2>Publicaciones de la comunidad</h2><p style='color: gray; font-style: italic;'>No se encontraron publicaciones que coincidan con tu búsqueda.</p>";
             return;
         }
 
@@ -137,6 +162,7 @@ async function cargarFeed() {
             const creadorPostId = post.usuario ? (post.usuario._id || post.usuario) : null;
             const idUsuarioActual = usuarioLogueado ? (usuarioLogueado._id || usuarioLogueado.id) : null;
 
+            // Construir comentarios
             let comentariosHTML = "";
             if (post.comentarios && post.comentarios.length > 0) {
                 post.comentarios.forEach(com => {
@@ -147,7 +173,6 @@ async function cargarFeed() {
                         ? `<button onclick="eliminarComentario('${post._id}', '${com._id}')" class="btn-borrar-comentario">🗑️</button>` 
                         : "";
 
-                    // SE MODIFICÓ AQUÍ: Ahora usa la clase 'comentario-item' y no estilos manuales
                     comentariosHTML += `
                         <div class="comentario-item">
                             <span><strong>@${comUsuarioNombre}</strong>: ${com.texto}</span>
@@ -159,6 +184,7 @@ async function cargarFeed() {
                 comentariosHTML = `<p class="comentarios-vacio">No hay comentarios aún.</p>`;
             }
 
+            // Formulario para añadir comentario si está logueado
             let formComentarioHTML = "";
             if (token) {
                 formComentarioHTML = `
@@ -191,13 +217,9 @@ async function cargarFeed() {
     }
 }
 
-// === CARGAR EL PERFIL EN MI_CUENTA.HTML ===
+// === CARGAR PERFIL DE USUARIO (MI CUENTA) ===
 async function cargarPerfilUsuario(token) {
-    if (!token) {
-        alert("Debes iniciar sesión para ver tu perfil.");
-        window.location.href = "login.html";
-        return;
-    }
+    if (!token) return;
 
     try {
         const respuesta = await fetch(`${URL_USUARIOS}/perfil`, {
@@ -205,33 +227,28 @@ async function cargarPerfilUsuario(token) {
             headers: { "Authorization": token }
         });
 
-        const usuario = await respuesta.json();
+        const datos = await respuesta.json();
 
-        if (!respuesta.ok) {
-            throw new Error(usuario.mensaje);
-        }
-
-        document.getElementById("display-user").textContent = usuario.username;
-        document.getElementById("display-bio").textContent = usuario.bio || "Sin biografía aún.";
-        
-        if (usuario.fotoPerfil) {
+        if (respuesta.ok) {
+            document.getElementById("display-user").textContent = datos.username || "Usuario";
+            document.getElementById("display-bio").textContent = datos.bio || "Sin biografía aún.";
+            
             const imgAvatar = document.getElementById("img-avatar");
             if (imgAvatar) {
-                imgAvatar.src = `http://localhost:3000/uploads/perfiles/${usuario.fotoPerfil}`;
+                imgAvatar.src = datos.fotoPerfil 
+                    ? `http://localhost:3000/uploads/perfiles/${datos.fotoPerfil}` 
+                    : "../uploads/perfiles/default-avatar.png"; 
             }
         }
-
-        cargarMisPublicaciones(token);
-
     } catch (error) {
-        console.error("Error al obtener perfil:", error);
+        console.error("Error en cargarPerfilUsuario:", error);
     }
 }
 
-// === CARGAR LAS PUBLICACIONES DEL PROPIO USUARIO ===
+// === CARGAR MIS PUBLICACIONES (EN MI CUENTA) ===
 async function cargarMisPublicaciones(token) {
     const galeria = document.getElementById("galeria-personal");
-    if (!galeria) return;
+    if (!galeria || !token) return;
 
     try {
         const respuesta = await fetch(`${URL_POSTS}/mis-posts`, {
@@ -239,42 +256,40 @@ async function cargarMisPublicaciones(token) {
             headers: { "Authorization": token }
         });
 
-        const misPosts = await respuesta.json();
+        const posts = await respuesta.json();
 
-        if (!respuesta.ok) {
-            throw new Error("Error al obtener tus publicaciones");
-        }
+        if (!respuesta.ok) throw new Error();
 
-        if (misPosts.length === 0) {
-            galeria.innerHTML = "<p>Aún no has subido ninguna publicación.</p>";
+        if (posts.length === 0) {
+            galeria.innerHTML = "<p>Aún no tienes publicaciones propias.</p>";
             return;
         }
 
-        galeria.innerHTML = ""; 
+        galeria.innerHTML = "";
 
-        misPosts.forEach(post => {
+        posts.forEach(post => {
             const item = document.createElement("div");
-            item.style.border = "1px solid #ddd";
-            item.style.padding = "10px";
-            item.style.margin = "10px 0";
-            item.style.borderRadius = "6px";
+            item.style.borderBottom = "1px solid #444";
+            item.style.padding = "15px 0";
 
+            // 🚀 MODIFICADO: Estilo integrado oscuro con borde rojo sutil para evitar discordancia de colores
             item.innerHTML = `
-                ${post.imagen ? `<img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" width="150" style="border-radius: 4px;"><br>` : ''}
-                <p>${post.texto}</p>
-                <button onclick="eliminarPublicacion('${post._id}')" style="background-color: red; color: white; border: none; padding: 5px 10px; border-radius: 4px; cursor: pointer;">Eliminar</button>
+                ${post.imagen ? `<img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" width="150" style="border-radius: 6px; margin-bottom: 8px;"><br>` : ''}
+                <p style="margin-bottom: 10px;">${post.texto}</p>
+                <button onclick="eliminarPublicacion('${post._id}')" style="background-color: #1e1e1e; color: #ef5350; border: 1px solid #c62828; padding: 6px 14px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.3s;" onmouseover="this.style.backgroundColor='#c62828'; this.style.color='#ffffff';" onmouseout="this.style.backgroundColor='#1e1e1e'; this.style.color='#ef5350';">Eliminar</button>
             `;
             galeria.appendChild(item);
         });
 
     } catch (error) {
-        console.error(error);
+        galeria.innerHTML = "<p>Error al cargar tus publicaciones.</p>";
     }
 }
 
-// === FUNCIÓN PARA ELIMINAR POST ===
-async function eliminarPublicacion(id) {
-    if (!confirm("¿Seguro que deseas eliminar esta publicación?")) return;
+// === ELIMINAR UNA PUBLICACIÓN PROPIA ===
+window.eliminarPublicacion = async (id) => {
+    if (!confirm("¿Estás seguro de que quieres eliminar esta publicación?")) return;
+
     const token = localStorage.getItem("token");
 
     try {
@@ -285,21 +300,22 @@ async function eliminarPublicacion(id) {
 
         if (respuesta.ok) {
             alert("Publicación eliminada correctamente.");
-            window.location.reload();
+            cargarMisPublicaciones(token); // Refresca tu lista personal
         } else {
-            alert("No se pudo eliminar la publicación.");
+            const datos = await respuesta.json();
+            alert(datos.mensaje || "No se pudo eliminar.");
         }
     } catch (error) {
-        console.error(error);
+        console.error("Error al eliminar publicación:", error);
     }
-}
+};
 
-// Función para enviar un nuevo comentario al Backend
-window.agregarComentario = async (event, postId) => {
-    event.preventDefault();
+// === AGREGAR UN COMENTARIO DESDE EL FEED ===
+window.agregarComentario = async (e, postId) => {
+    e.preventDefault();
     const token = localStorage.getItem("token");
     const inputTexto = document.getElementById(`input-comentario-${postId}`);
-    
+
     if (!inputTexto || !inputTexto.value.trim()) return;
 
     try {
@@ -325,7 +341,7 @@ window.agregarComentario = async (event, postId) => {
     }
 };
 
-// Función para eliminar un comentario
+// === ELIMINAR UN COMENTARIO ===
 window.eliminarComentario = async (postId, comentarioId) => {
     if (!confirm("¿Seguro que deseas eliminar este comentario?")) return;
     const token = localStorage.getItem("token");
