@@ -60,7 +60,7 @@ const crearUsuario = async (req, res) => {
     }
 };
 
-// 🚀 LOGICA DE ELIMINACIÓN DE CUENTA EN CASCADA
+
 const eliminarCuenta = async (req, res) => {
     try {
         const usuarioId = req.usuario; // Obtenido del authMiddleware
@@ -87,5 +87,5 @@ module.exports = {
     obtenerPerfil,
     obtenerUsuarios,
     crearUsuario,
-    eliminarCuenta // 👈 Exportado correctamente
+    eliminarCuenta 
 };

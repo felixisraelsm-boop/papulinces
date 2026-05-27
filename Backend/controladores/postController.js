@@ -22,7 +22,7 @@ const crearPost = async (req, res) => {
     }
 };
 
-// 🚀 MODIFICADO: Ahora soporta filtros de búsqueda en tiempo real
+
 const obtenerPosts = async (req, res) => {
     try {
         const { buscar } = req.query;

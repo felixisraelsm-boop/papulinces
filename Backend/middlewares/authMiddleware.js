@@ -11,7 +11,7 @@ const protegerRuta = (req, res, next) => {
     }
 
     try {
-        // 💡 CAMBIO AQUÍ: Usamos la misma palabra que en el Login para que no falle
+        
         const verificar = jwt.verify(token, "secretotemporal");
 
         // Guardamos el id del usuario en la petición para que el controlador sepa quién es
