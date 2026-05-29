@@ -1,4 +1,4 @@
-require("dotenv").config();
+require("dotenv").config(); 
 const express = require("express");
 const cors = require("cors");
 const path = require("path");
@@ -9,7 +9,6 @@ const app = express();
 conectarDB();
 
 // 2. Middlewares Globales
-// 🚀 OPTIMIZADO: CORS explícito que permite métodos DELETE y OPTIONS sin restricciones
 app.use(cors({
     origin: "*",
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
