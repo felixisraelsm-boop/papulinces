@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+const mongoose = require("mongoose"); // Importamos Mongoose para definir el esquema de la publicación y los comentarios
 
 // Esquema para los comentarios individuales
 const comentarioSchema = mongoose.Schema({
@@ -14,7 +14,7 @@ const comentarioSchema = mongoose.Schema({
 }, {
     timestamps: true // Para saber a qué hora comentaron
 });
-
+// Esquema para las publicaciones, que incluye un array de comentarios
 const publicacionSchema = mongoose.Schema({
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
@@ -29,7 +29,7 @@ const publicacionSchema = mongoose.Schema({
         type: String,
         default: ""
     },
-    // 🚀 AQUÍ AGREGAMOS LOS COMENTARIOS
+
     comentarios: [comentarioSchema]
 }, {
     timestamps: true
@@ -38,4 +38,4 @@ const publicacionSchema = mongoose.Schema({
 module.exports = mongoose.model(
     "Publicacion",
     publicacionSchema
-);
+); // Exportamos el modelo de Publicación para usarlo en otras partes del backend (controladores, rutas, etc.)

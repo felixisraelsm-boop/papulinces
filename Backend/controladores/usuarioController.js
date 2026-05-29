@@ -1,4 +1,4 @@
-const Usuario = require("../modelos/Usuario");
+const Usuario = require("../modelos/Usuario"); 
 const Publicacion = require("../modelos/Publicacion"); 
 
 const obtenerPerfil = async (req, res) => {
