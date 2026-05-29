@@ -6,11 +6,11 @@ const comentarioSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Usuario", // Reutiliza tu modelo de Usuario
         required: true
-    },
+    }, // El campo de usuario es una referencia al modelo de Usuario, lo que nos permite relacionar cada comentario con el usuario que lo hizo
     texto: {
         type: String,
         required: true
-    }
+    } // El texto del comentario es obligatorio
 }, {
     timestamps: true // Para saber a qué hora comentaron
 });
@@ -20,7 +20,7 @@ const publicacionSchema = mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: "Usuario",
         required: true
-    },
+    }, // El campo de usuario es una referencia al modelo de Usuario, lo que nos permite relacionar cada publicación con el usuario que la creó
     texto: {
         type: String,
         required: true
