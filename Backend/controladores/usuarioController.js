@@ -56,11 +56,10 @@ const crearUsuario = async (req, res) => {
     } catch (error) {
         res.status(500).json({
             mensaje: "Error al crear usuario"
-        });
+        }); 
     }
 };
 
-// 🚀 LOGICA DE ELIMINACIÓN DE CUENTA EN CASCADA
 const eliminarCuenta = async (req, res) => {
     try {
         const usuarioId = req.usuario; // Obtenido del authMiddleware
@@ -87,5 +86,5 @@ module.exports = {
     obtenerPerfil,
     obtenerUsuarios,
     crearUsuario,
-    eliminarCuenta // 👈 Exportado correctamente
+    eliminarCuenta 
 };

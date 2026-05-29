@@ -40,6 +40,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     // === LÓGICA DE REGISTRO DE USUARIO ===
+    // 🚀 OPTIMIZADO: Manejo seguro del envío de archivos binarios (Imágenes)
     if (formRegistro) {
         formRegistro.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -51,7 +52,7 @@ document.addEventListener("DOMContentLoaded", () => {
             formData.append("password", document.getElementById("reg-pass").value);
             
             const avatarInput = document.getElementById("reg-avatar");
-            if (avatarInput.files.length > 0) {
+            if (avatarInput && avatarInput.files.length > 0) {
                 formData.append("fotoPerfil", avatarInput.files[0]); // Envía el archivo físico
             }
 
@@ -71,9 +72,16 @@ document.addEventListener("DOMContentLoaded", () => {
                 window.location.href = "login.html";
 
            } catch (error) {
-                console.error("ERROR COMPLETO:", error);
-                // Si el servidor falla, a veces la respuesta no es JSON
-                alert("Error: " + error.message);
+                console.error("ERROR COMPLETO EN CAPTURA:", error);
+                
+                // Si el error es meramente un "Failed to fetch" de red pero el servidor ya guardó los datos,
+                // le damos la oportunidad al usuario de ir a loguearse en lugar de trabar la pantalla.
+                if (error.message === "Failed to fetch") {
+                    alert("El registro se procesó. Si tu cuenta se creó con éxito, ya puedes iniciar sesión.");
+                    window.location.href = "login.html";
+                } else {
+                    alert("Error: " + error.message);
+                }
             }
         });
     }

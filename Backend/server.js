@@ -9,13 +9,21 @@ const app = express();
 conectarDB();
 
 // 2. Middlewares Globales
-app.use(cors()); 
+// 🚀 OPTIMIZADO: CORS explícito que permite métodos DELETE y OPTIONS sin restricciones
+app.use(cors({
+    origin: "*",
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"]
+})); 
+
 app.use(express.json());
 
 // 3. Configurar la carpeta de archivos estáticos para las subidas (Multer)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+app.use("/uploads/perfiles", express.static(path.join(__dirname, "uploads/perfiles")));
+app.use("/uploads/publicaciones", express.static(path.join(__dirname, "uploads/publicaciones")));
 
-// 4. Importar Rutas (¡Una sola vez cada una!)
+// 4. Importar Rutas
 const authRoutes = require("./routes/authRoutes");
 const usuarioRoutes = require("./routes/usuarioRoutes");
 const postRoutes = require("./routes/postRoutes");

@@ -11,7 +11,7 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("feed-dinamico")) {
         cargarFeed();
 
-        // 🚀 AGREGADO: Lógica para el funcionamiento del Buscador Global
+        // Lógica para el funcionamiento del Buscador Global
         const btnBuscar = document.getElementById("btn-buscar");
         const inputBusqueda = document.getElementById("busqueda-global");
 
@@ -33,6 +33,12 @@ document.addEventListener("DOMContentLoaded", () => {
     if (document.getElementById("info-perfil")) {
         cargarPerfilUsuario(token);
         cargarMisPublicaciones(token); // Carga tus fotos al entrar a la cuenta
+        
+        // 🚀 ESCUCHAR EL CLIC DEL BOTÓN EN MI_CUENTA.HTML
+        const btnEliminarCuenta = document.getElementById("btn-eliminar-cuenta");
+        if (btnEliminarCuenta) {
+            btnEliminarCuenta.addEventListener("click", eliminarMiCuenta);
+        }
     }
 });
 
@@ -96,7 +102,6 @@ async function crearNuevaPublicacion(e) {
     const texto = document.getElementById("texto-post").value;
     const imagenInput = document.getElementById("imagen-post");
 
-    // Como subimos archivo físico usamos FormData
     const formData = new FormData();
     formData.append("texto", texto);
     if (imagenInput.files.length > 0) {
@@ -107,7 +112,7 @@ async function crearNuevaPublicacion(e) {
         const respuesta = await fetch(URL_POSTS, {
             method: "POST",
             headers: {
-                "Authorization": token // Pasamos el token para saber quién publica
+                "Authorization": token
             },
             body: formData
         });
@@ -116,8 +121,8 @@ async function crearNuevaPublicacion(e) {
 
         if (respuesta.ok) {
             alert("¡Publicación subida con éxito!");
-            document.getElementById("form-publicar").reset(); // Limpia el formulario
-            cargarFeed(); // Recarga las publicaciones abajo
+            document.getElementById("form-publicar").reset(); 
+            cargarFeed(); 
         } else {
             alert("Error: " + datos.mensaje);
         }
@@ -127,7 +132,7 @@ async function crearNuevaPublicacion(e) {
     }
 }
 
-// === CARGAR LAS PUBLICACIONES EN EL FEED (CON SOPORTE DE BÚSQUEDA) ===
+// === CARGAR LAS PUBLICACIONES EN EL FEED ===
 async function cargarFeed(terminoBusqueda = "") {
     const contenedorFeed = document.getElementById("feed-dinamico");
     if (!contenedorFeed) return;
@@ -136,7 +141,6 @@ async function cargarFeed(terminoBusqueda = "") {
     const usuarioLogueado = localStorage.getItem("usuario") ? JSON.parse(localStorage.getItem("usuario")) : null;
 
     try {
-        // 🚀 URL dinámica: Si busca algo, añade '?buscar=palabra'
         const urlFinal = terminoBusqueda 
             ? `${URL_POSTS}?buscar=${encodeURIComponent(terminoBusqueda)}` 
             : URL_POSTS;
@@ -162,7 +166,6 @@ async function cargarFeed(terminoBusqueda = "") {
             const creadorPostId = post.usuario ? (post.usuario._id || post.usuario) : null;
             const idUsuarioActual = usuarioLogueado ? (usuarioLogueado._id || usuarioLogueado.id) : null;
 
-            // Construir comentarios
             let comentariosHTML = "";
             if (post.comentarios && post.comentarios.length > 0) {
                 post.comentarios.forEach(com => {
@@ -184,7 +187,6 @@ async function cargarFeed(terminoBusqueda = "") {
                 comentariosHTML = `<p class="comentarios-vacio">No hay comentarios aún.</p>`;
             }
 
-            // Formulario para añadir comentario si está logueado
             let formComentarioHTML = "";
             if (token) {
                 formComentarioHTML = `
@@ -245,7 +247,7 @@ async function cargarPerfilUsuario(token) {
     }
 }
 
-// === CARGAR MIS PUBLICACIONES (EN MI CUENTA) ===
+// === CARGAR MIS PUBLICACIONES ===
 async function cargarMisPublicaciones(token) {
     const galeria = document.getElementById("galeria-personal");
     if (!galeria || !token) return;
@@ -272,7 +274,6 @@ async function cargarMisPublicaciones(token) {
             item.style.borderBottom = "1px solid #444";
             item.style.padding = "15px 0";
 
-            // 🚀 MODIFICADO: Estilo integrado oscuro con borde rojo sutil para evitar discordancia de colores
             item.innerHTML = `
                 ${post.imagen ? `<img src="http://localhost:3000/uploads/publicaciones/${post.imagen}" width="150" style="border-radius: 6px; margin-bottom: 8px;"><br>` : ''}
                 <p style="margin-bottom: 10px;">${post.texto}</p>
@@ -300,7 +301,7 @@ window.eliminarPublicacion = async (id) => {
 
         if (respuesta.ok) {
             alert("Publicación eliminada correctamente.");
-            cargarMisPublicaciones(token); // Refresca tu lista personal
+            cargarMisPublicaciones(token); 
         } else {
             const datos = await respuesta.json();
             alert(datos.mensaje || "No se pudo eliminar.");
@@ -310,7 +311,7 @@ window.eliminarPublicacion = async (id) => {
     }
 };
 
-// === AGREGAR UN COMENTARIO DESDE EL FEED ===
+// === AGREGAR UN COMENTARIO ===
 window.agregarComentario = async (e, postId) => {
     e.preventDefault();
     const token = localStorage.getItem("token");
@@ -366,3 +367,41 @@ window.eliminarComentario = async (postId, comentarioId) => {
         console.error("Error en eliminarComentario:", error);
     }
 };
+
+// 🚀 FUNCIÓN COMPLETA PARA ELIMINAR CUENTA DESDE EL FRONTEND
+async function eliminarMiCuenta() {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+        alert("No has iniciado sesión o tu sesión ha expirado.");
+        return;
+    }
+
+    if (!confirm("⚠️ ¿ESTÁS TOTALMENTE SEGURO? Esta acción eliminará permanentemente tu perfil y todos tus posts en cascada. Esto no se puede deshacer.")) {
+        return;
+    }
+
+    try {
+        // Ahora llama a la ruta correcta '/eliminar'
+        const respuesta = await fetch(`${URL_USUARIOS}/eliminar`, {
+            method: "DELETE",
+            headers: {
+                "Authorization": token,
+                "Content-Type": "application/json"
+            }
+        });
+
+        const datos = await respuesta.json();
+
+        if (respuesta.ok) {
+            alert(datos.mensaje || "Tu cuenta ha sido eliminada.");
+            localStorage.clear(); // Limpia la sesión local
+            window.location.href = "registro.html"; // Envía al usuario de vuelta al registro
+        } else {
+            alert("Error: " + datos.mensaje);
+        }
+    } catch (error) {
+        console.error("Error al intentar eliminar la cuenta:", error);
+        alert("Hubo un error de conexión con el servidor.");
+    }
+}
