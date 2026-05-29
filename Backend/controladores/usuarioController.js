@@ -59,7 +59,6 @@ const crearUsuario = async (req, res) => {
         }); 
     }
 };
-
 const eliminarCuenta = async (req, res) => {
     try {
         const usuarioId = req.usuario; // Obtenido del authMiddleware

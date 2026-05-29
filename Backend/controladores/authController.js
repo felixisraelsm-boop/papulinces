@@ -33,7 +33,7 @@ const registrarUsuario = async (req, res) => {
         res.status(201).json({ mensaje: "Usuario registrado correctamente" });
 
     } catch (error) {
-        // ESTE CAMBIO TE DARÁ EL ERROR REAL EN LA PESTAÑA "RESPONSE" DEL NAVEGADOR
+        
         console.error("ERROR DETALLADO:", error); 
         res.status(500).json({ 
             mensaje: "Error en el servidor", 
