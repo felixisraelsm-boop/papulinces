@@ -1,7 +1,7 @@
 const URL_POSTS = "http://localhost:3000/api/posts";
-const URL_USUARIOS = "http://localhost:3000/api/usuarios";
+const URL_USUARIOS = "http://localhost:3000/api/usuarios"; // La URL base para las operaciones relacionadas con usuarios (perfil, eliminación, etc.)
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => { // Al cargar la página, verificamos si hay un token de sesión activo para ajustar la vista y cargar datos dinámicos
     const token = localStorage.getItem("token");
     
     // Configurar barra de navegación y área de post dinámicas
@@ -34,7 +34,7 @@ document.addEventListener("DOMContentLoaded", () => {
         cargarPerfilUsuario(token);
         cargarMisPublicaciones(token); // Carga tus fotos al entrar a la cuenta
         
-        // 🚀 ESCUCHAR EL CLIC DEL BOTÓN EN MI_CUENTA.HTML
+        // Configuramos el botón de eliminar cuenta
         const btnEliminarCuenta = document.getElementById("btn-eliminar-cuenta");
         if (btnEliminarCuenta) {
             btnEliminarCuenta.addEventListener("click", eliminarMiCuenta);
@@ -368,7 +368,6 @@ window.eliminarComentario = async (postId, comentarioId) => {
     }
 };
 
-// 🚀 FUNCIÓN COMPLETA PARA ELIMINAR CUENTA DESDE EL FRONTEND
 async function eliminarMiCuenta() {
     const token = localStorage.getItem("token");
 

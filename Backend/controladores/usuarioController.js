@@ -1,4 +1,4 @@
-const Usuario = require("../modelos/Usuario");
+const Usuario = require("../modelos/Usuario"); 
 const Publicacion = require("../modelos/Publicacion"); 
 
 const obtenerPerfil = async (req, res) => {
@@ -63,27 +63,27 @@ const eliminarCuenta = async (req, res) => {
     try {
         const usuarioId = req.usuario; // Obtenido del authMiddleware
 
-        // 1. Borrar todas las publicaciones del usuario para no dejar registros huérfanos
+        //Borrar todas las publicaciones del usuario para no dejar registros huérfanos
         await Publicacion.deleteMany({ usuario: usuarioId });
 
-        // 2. Borrar permanentemente al usuario
+        //Borrar permanentemente al usuario
         const usuarioEliminado = await Usuario.findByIdAndDelete(usuarioId);
 
         if (!usuarioEliminado) {
             return res.status(404).json({ mensaje: "El usuario no existe o ya fue eliminado." });
-        }
+        } // Si el usuario se eliminó correctamente, respondemos con un mensaje de éxito
 
         res.json({ mensaje: "Tu cuenta y todas tus publicaciones han sido eliminadas correctamente." });
 
-    } catch (error) {
+    } catch (error) { 
         console.error("Error al eliminar cuenta:", error);
         res.status(500).json({ mensaje: "Error interno del servidor al eliminar la cuenta." });
-    }
-};
+    }  
+}; 
 
 module.exports = {
     obtenerPerfil,
     obtenerUsuarios,
     crearUsuario,
     eliminarCuenta 
-};
+}; //se exportan los modulos para usarse en demas partes
