@@ -1,0 +1,325 @@
+/* Variables y Estilos Generales */
+:root {
+  --cr-size: 18px;
+  --cr-radius: 4px;
+  --cr-border-w: 2px;
+  --cr-font-size: 0.95rem;
+  --cr-gap: 8px;
+  --cr-font-color: #f4f4f5;
+  --cr-unchecked-bg: #18181b;
+  --cr-unchecked-border: #3f3f46;
+  --cr-checked-bg: #eab308;
+  --cr-checked-border: #eab308;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #050505;
+    color: #f3f4f6;
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Header Principal (para el Menú) */
+.main-header {
+    background-color: #121212;
+    border-bottom: 1px solid #222;
+    padding: 1rem;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.main-header h1 {
+    margin: 0;
+    color: #eab308;
+    font-weight: 500;
+    font-size: 1.5rem;
+}
+
+/* Contenedor Principal (para la Lista y el Menú) */
+.container {
+    background-color: #121212;
+    padding: 1.5rem;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 500px;
+    border: 1px solid #222;
+    margin-top: 2rem;
+    box-sizing: border-box;
+}
+
+h2 {
+    margin-top: 0;
+    text-align: center;
+    color: #eab308;
+    font-weight: 500;
+}
+
+/* Estilos para el Menú Principal (Tarjetas centradas) */
+.main-wrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1.5rem;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.menu-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    max-width: 500px;
+}
+
+.menu-card {
+    background-color: #18181b;
+    padding: 16px;
+    border-radius: 8px;
+    border: 1px solid #27272a;
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #f3f4f6;
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.menu-card:hover {
+    border-color: #eab308;
+    background-color: #27272a;
+}
+
+.menu-info h3 {
+    margin: 0 0 4px 0;
+    font-size: 1rem;
+    color: #eab308;
+    font-weight: 500;
+}
+
+.menu-info p {
+    margin: 0;
+    font-size: 0.8rem;
+    color: #71717a;
+}
+
+.slot-libre {
+    border: 1px dashed #3f3f46;
+}
+
+.slot-libre:hover {
+    border-color: #f97316;
+}
+
+/* Formulario de Compras */
+.input-group {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+input[type="text"] {
+    flex: 1;
+    padding: 12px;
+    border: 1px solid #333;
+    background-color: #18181b;
+    color: #fff;
+    border-radius: 6px;
+    outline: none;
+    font-size: 1rem;
+    transition: border-color 0.2s;
+}
+
+input[type="text"]:focus {
+    border-color: #eab308;
+}
+
+button {
+    padding: 12px 18px;
+    background-color: #eab308;
+    color: #050505;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+button:hover {
+    background-color: #ca8a04;
+}
+
+ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0 0 15px 0;
+    max-height: 60vh;
+    overflow-y: auto;
+}
+
+/* Checkbox personalizado */
+.cr-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--cr-gap);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--cr-font-size);
+  color: var(--cr-font-color);
+  flex: 1.2;
+  overflow: hidden;
+}
+
+.cr-wrapper input {
+  position: absolute;
+  opacity: 0.01;
+  width: 0;
+  height: 0;
+  pointer-events: none;
+}
+
+.cr-input {
+  position: relative;
+  flex-shrink: 0;
+  width: var(--cr-size);
+  height: var(--cr-size);
+  border-radius: var(--cr-radius);
+  border: var(--cr-border-w) solid var(--cr-unchecked-border);
+  background: var(--cr-unchecked-bg);
+  box-sizing: border-box;
+  transition: all 0.15s;
+}
+
+.cr-wrapper:hover .cr-input {
+  background: #27272a;
+  border-color: #eab308;
+}
+
+.cr-wrapper input:checked ~ .cr-input {
+  background: var(--cr-checked-bg);
+  border-color: var(--cr-checked-border);
+}
+
+.cr-wrapper input:checked ~ .cr-input::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 8px;
+  height: 8px;
+  background: #050505;
+  clip-path: polygon(42% 0%, 58% 0%, 58% 42%, 100% 42%, 100% 58%, 58% 58%, 58% 100%, 42% 100%, 42% 58%, 0% 58%, 0% 42%, 42% 42%);
+}
+
+.cr-wrapper input:checked ~ span {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+li {
+    background-color: #18181b;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid #27272a;
+}
+
+.controles-derecha {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.input-cant, .input-precio {
+    width: 55px;
+    padding: 6px 4px;
+    background-color: #09090b;
+    border: 1px solid #3f3f46;
+    color: #eab308;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    text-align: center;
+}
+
+.input-cant:focus, .input-precio:focus {
+    border-color: #eab308;
+    outline: none;
+}
+
+.subtotal-texto {
+    font-size: 0.85rem;
+    color: #f97316;
+    font-weight: 600;
+    min-width: 60px;
+    text-align: right;
+}
+
+.btn-eliminar {
+    background-color: transparent;
+    color: #71717a;
+    padding: 6px 8px;
+    font-size: 0.85rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s, background-color 0.2s;
+}
+
+.btn-eliminar:hover {
+    background-color: #27272a;
+    color: #fca5a5;
+}
+
+.total-container {
+    background-color: #18181b;
+    padding: 12px 16px;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    color: #eab308;
+    border: 1px solid #27272a;
+}
+
+.total-container span {
+    color: #f97316;
+    font-size: 1.1rem;
+    font-weight: bold;
+}
+
+/* Botón de Retorno Abajo a la Derecha (Optimizado para Celular) */
+.footer-retorno {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
+.btn-volver-abajo {
+    font-size: 1rem;
+    color: #f3f4f6;
+    text-decoration: none;
+    background-color: #18181b;
+    border: 1px solid #3f3f46;
+    padding: 12px 20px;
+    border-radius: 8px;
+    font-weight: bold;
+    transition: all 0.2s;
+}
+
+.btn-volver-abajo:hover {
+    color: #050505;
+    background-color: #eab308;
+    border-color: #eab308;
+}
