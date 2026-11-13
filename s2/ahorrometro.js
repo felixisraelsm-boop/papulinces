@@ -2,6 +2,7 @@ const texto = document.getElementById('nombreInput');
 const boton = document.getElementById('agregarBtn');
 const lista = document.getElementById('listaNombres');
 const total = document.getElementById('totalGeneral');
+const guardarBtn = document.getElementById('guardarListaBtn'); // Referencia al botón
 
 function sumarTotal() {
     let suma = 0;
@@ -25,7 +26,6 @@ function agregar() {
 
     const li = document.createElement('li');
 
-    // Creamos la estructura del checkbox personalizado (cr-wrapper)
     const label = document.createElement('label');
     label.className = 'cr-wrapper';
 
@@ -38,12 +38,10 @@ function agregar() {
     const spanNombre = document.createElement('span');
     spanNombre.textContent = val;
 
-    // Juntamos el checkbox dentro del label
     label.appendChild(checkbox);
     label.appendChild(crInput);
     label.appendChild(spanNombre);
 
-    // Contenedor derecho para los números y el botón
     const div = document.createElement('div');
     div.className = 'controles-derecha';
 
@@ -93,14 +91,49 @@ function agregar() {
     div.appendChild(sub);
     div.appendChild(eliminar);
 
-    // Metemos el checkbox y los controles al renglón
     li.appendChild(label);
     li.appendChild(div);
-
     lista.appendChild(li);
 
     texto.value = "";
     texto.focus();
+}
+
+// Función para enviar el total a Node.js y XAMPP
+function guardarListaEnDB() {
+    const itemsLi = lista.querySelectorAll('li');
+
+    if (itemsLi.length === 0) {
+        alert("La lista está vacía, agrega al menos un producto.");
+        return;
+    }
+
+    const totalTexto = total.textContent.replace('$', '').trim();
+    const totalGeneralNum = parseFloat(totalTexto) || 0;
+
+    fetch('http://localhost:3000/api/guardar-lista', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            totalGeneral: totalGeneralNum
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.error) {
+            alert("Hubo un error al guardar: " + data.error);
+        } else {
+            alert("¡Total de la lista guardado en el historial con su fecha!");
+            lista.innerHTML = ''; 
+            sumarTotal(); 
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert("No se pudo conectar con el servidor. Revisa si Node.js está encendido.");
+    });
 }
 
 boton.addEventListener('click', agregar);
@@ -110,3 +143,8 @@ texto.addEventListener('keypress', function(e) {
         agregar();
     }
 });
+
+// ¡Vinculamos el clic del botón aquí!
+if (guardarBtn) {
+    guardarBtn.addEventListener('click', guardarListaEnDB);
+}

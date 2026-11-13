@@ -7,7 +7,7 @@
     <link rel="stylesheet" href="ahorrometro.css">
 </head>
 <body>
-<div class="container">
+    <div class="container">
         <h2>ahorrometro</h2>
         <div class="input-group">
             <input type="text" id="nombreInput" placeholder="¿Qué necesitas comprar?" autocomplete="off">
@@ -17,10 +17,15 @@
         <div class="total-container">
             <strong>Total a Pagar: </strong><span id="totalGeneral">$0.00</span>
         </div>
+        
+        <!-- Botón para guardar en la base de datos -->
+        <button id="guardarListaBtn" style="width: 100%; margin-top: 15px; background-color: #22c55e; color: #fff;">Guardar Lista en Base de Datos</button>
     </div>
+
     <div class="footer-retorno">
-    <a href="menu.html" class="btn-volver-abajo">← Volver</a>
-</div>
+        <a href="menu.html" class="btn-volver-abajo">← Volver</a>
+    </div>
+
     <script src="ahorrometro.js"></script>
 </body>
 </html>
