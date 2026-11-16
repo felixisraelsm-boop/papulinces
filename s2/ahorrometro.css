@@ -233,17 +233,18 @@ li {
 .footer-retorno {
     display: flex;
     justify-content: flex-end;
-    margin-top: 15px;
+    margin-top: 20px;
 }
 
 .btn-volver-abajo {
-    font-size: 0.85rem;
-    color: #a1a1aa;
+    font-size: 0.9rem;
+    color: #f3f4f6;
     text-decoration: none;
     background-color: #18181b;
-    border: 1px solid #27272a;
-    padding: 8px 14px;
-    border-radius: 6px;
+    border: 1px solid #3f3f46;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: bold;
     transition: all 0.2s;
 }
 
