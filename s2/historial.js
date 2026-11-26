@@ -36,8 +36,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 total.className = 'registro-total';
                 total.textContent = `$${parseFloat(item.total_general).toFixed(2)}`;
 
+                const eliminar = document.createElement('button');
+                eliminar.className = 'btn-eliminar';
+                eliminar.textContent = '✕';
+                eliminar.onclick = function() {
+                    lista.removeChild(li);
+                    fetch(`http://localhost:3000/api/historial/${item.id}`, {
+                        method: 'DELETE'
+                    })
+                    .then(res => res.json())
+                    .then(data => {
+                        if (data.error) {
+                            console.error('Error al eliminar el registro:', data.error);
+                        }
+                    });
+                };
+
                 li.appendChild(info);
                 li.appendChild(total);
+                li.appendChild(eliminar);
                 lista.appendChild(li);
             });
         })
